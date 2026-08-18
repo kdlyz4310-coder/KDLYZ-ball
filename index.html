@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8">
-<title>Ball Game V2</title>
-<style>
-body{margin:0;background:#111;color:white;font-family:sans-serif;text-align:center}
-canvas{display:block;margin:20px auto;background:#000;border:2px solid #fff}
-</style>
+<meta元数据 charset字符集="UTF-8">
+<title标题标题>Ball Game V2</title标题标题标题标题标题><title标题标题标题标题标题标题标题标题标题标题标题>球类游戏V2</title标题标题标题标题标题><title标题标题标题标题标题标题标题标题标题标题标题>球类游戏V2球赛V2</title标题标题标题标题标题标题标题标题标题标题标题>
+<style样式>
+body主体{margin边距:0;background:#111;color:white;font-family:sans-serif;text-align:center}
+canvas{display:block;margin边距:20px auto;background:#000;border:2px solid #fff}
+</style样式>
 </head>
-<body>
+<body主体>
 <h2>Ball Game V2 - 双球打砖块</h2>
 <div>Score: <span id="score">0</span></div>
-<canvas id="game" width="400" height="600"></canvas>
+<canvas画布 id="game" width="400" height="600"></canvas画布>
 <script>
 const c=document.getElementById("game");
 const ctx=c.getContext("2d");
 let score=0;
 
 const balls=[
-{x:100,y:300,r:10,vx:3,vy:2,color:"cyan"},
-{x:300,y:200,r:10,vx:-2.5,vy:3,color:"red"}
+{x:100,y:300,r:10,vx:3,vy:2,color颜色:"cyan"},
+{x:300,y:200,r:10,vx:-2.5,vy:3,color颜色:"red"}
 ];
 
 const particles=[];
