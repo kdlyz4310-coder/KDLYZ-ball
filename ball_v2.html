@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Ball Game V2</title>
+<style>
+body{margin:0;background:#111;color:white;font-family:sans-serif;text-align:center}
+canvas{display:block;margin:20px auto;background:#000;border:2px solid #fff}
+</style>
+</head>
+<body>
+<h2>Ball Game V2 - 双球打砖块</h2>
+<div>Score: <span id="score">0</span></div>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+let score=0;
+
+const balls=[
+{x:100,y:300,r:10,vx:3,vy:2,color:"cyan"},
+{x:300,y:200,r:10,vx:-2.5,vy:3,color:"red"}
+];
+
+const particles=[];
+const bricks=[];
+for(let r=0;r<5;r++){
+ for(let col=0;col<8;col++){
+  bricks.push({x:col*50+5,y:r*25+30,w:40,h:15,alive:true});
+ }
+}
+
+function particle(x,y){
+ for(let i=0;i<15;i++){
+  particles.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,life:25});
+ }
+}
+
+function update(){
+ ctx.fillStyle="rgba(0,0,0,.12)";
+ ctx.fillRect(0,0,400,600);
+
+ for(const b of bricks){
+  if(b.alive){
+   ctx.fillStyle="orange";
+   ctx.fillRect(b.x,b.y,b.w,b.h);
+  }
+ }
+
+ for(const ball of balls){
+  ball.x+=ball.vx;
+  ball.y+=ball.vy;
+  if(ball.x<ball.r||ball.x>400-ball.r) ball.vx*=-1;
+  if(ball.y<ball.r||ball.y>600-ball.r) ball.vy*=-1;
+
+  for(const br of bricks){
+   if(br.alive &&
+      ball.x>br.x && ball.x<br.x+br.w &&
+      ball.y>br.y && ball.y<br.y+br.h){
+      br.alive=false;
+      ball.vy*=-1;
+      score++;
+      document.getElementById("score").textContent=score;
+      particle(ball.x,ball.y);
+   }
+  }
+
+  ctx.beginPath();
+  ctx.fillStyle=ball.color;
+  ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ if(Math.hypot(balls[0].x-balls[1].x,balls[0].y-balls[1].y)<balls[0].r+balls[1].r){
+   [balls[0].vx,balls[1].vx]=[balls[1].vx,balls[0].vx];
+   [balls[0].vy,balls[1].vy]=[balls[1].vy,balls[0].vy];
+   particle((balls[0].x+balls[1].x)/2,(balls[0].y+balls[1].y)/2);
+ }
+
+ for(let i=particles.length-1;i>=0;i--){
+  const p=particles[i];
+  p.x+=p.vx;p.y+=p.vy;p.life--;
+  ctx.globalAlpha=p.life/25;
+  ctx.fillStyle="white";
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,2,0,Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha=1;
+  if(p.life<=0) particles.splice(i,1);
+ }
+
+ requestAnimationFrame(update);
+}
+update();
+</script>
+</body>
+</html>
