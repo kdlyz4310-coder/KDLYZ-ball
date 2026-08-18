@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ball Game</title>
+<style>
+body{margin:0;background:#111;color:white;text-align:center;font-family:sans-serif}
+canvas{display:block;margin:auto;background:#000}
+</style>
+</head>
+<body>
+<h2>Ball Game V3</h2>
+<div>Score: <span id="score">0</span></div>
+<canvas id="game" width="400" height="600"></canvas>
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+let score=0;
+
+let balls=[
+{x:100,y:300,r:15,vx:4,vy:3,color:"cyan"},
+{x:300,y:200,r:15,vx:-3,vy:4,color:"red"}
+];
+
+let paddle={x:150,y:560,w:100,h:12,speed:7};
+let left=false,right=false;
+
+let bricks=[];
+for(let r=0;r<6;r++){
+ for(let c=0;c<8;c++){
+  bricks.push({x:c*50+5,y:r*25+30,w:40,h:15,alive:true});
+ }
+}
+
+let particles=[];
+
+document.addEventListener("keydown",e=>{
+ if(e.key=="ArrowLeft")left=true;
+ if(e.key=="ArrowRight")right=true;
+});
+document.addEventListener("keyup",e=>{
+ if(e.key=="ArrowLeft")left=false;
+ if(e.key=="ArrowRight")right=false;
+});
+
+function boom(x,y,color){
+ for(let i=0;i<20;i++)
+ particles.push({x,y,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,life:30,color});
+}
+
+function updatePaddle(){
+ if(left)paddle.x-=paddle.speed;
+ if(right)paddle.x+=paddle.speed;
+ paddle.x=Math.max(0,Math.min(300,paddle.x));
+}
+
+function drawPaddle(){
+ ctx.fillStyle="white";
+ ctx.fillRect(paddle.x,paddle.y,paddle.w,paddle.h);
+}
+
+function drawBricks(){
+ for(let b of bricks){
+  if(b.alive){
+   ctx.fillStyle="orange";
+   ctx.fillRect(b.x,b.y,b.w,b.h);
+  }
+ }
+}
+
+function updateBall(b){
+ b.x+=b.vx;b.y+=b.vy;
+ if(b.x<0||b.x>400)b.vx*=-1;
+ if(b.y<0)b.vy*=-1;
+
+ if(b.y+b.r>paddle.y&&b.x>paddle.x&&b.x<paddle.x+paddle.w)
+  b.vy=-Math.abs(b.vy);
+
+ for(let br of bricks){
+  if(br.alive&&b.x>br.x&&b.x<br.x+br.w&&b.y>br.y&&b.y<br.y+br.h){
+   br.alive=false;b.vy*=-1;score++;
+   document.getElementById("score").innerText=score;
+   boom(b.x,b.y,"orange");
+  }
+ }
+}
+
+function drawBall(b){
+ ctx.fillStyle=b.color;
+ ctx.beginPath();
+ ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+ ctx.fill();
+}
+
+function particles(){
+ for(let i=particles.length-1;i>=0;i--){
+  let p=particles[i];
+  p.x+=p.vx;p.y+=p.vy;p.life--;
+  ctx.globalAlpha=p.life/30;
+  ctx.fillStyle=p.color;
+  ctx.fillRect(p.x,p.y,3,3);
+  ctx.globalAlpha=1;
+  if(p.life<=0)particles.splice(i,1);
+ }
+}
+
+function loop(){
+ ctx.fillStyle="rgba(0,0,0,.15)";
+ ctx.fillRect(0,0,400,600);
+
+ updatePaddle();
+ drawPaddle();
+ drawBricks();
+
+ for(let b of balls){updateBall(b);drawBall(b);}
+ particles();
+
+ requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
